@@ -2,7 +2,7 @@
 
 // Use this to parse arguments for solve
 var parse = function(input) {
-  var N = input.readInt();
+  var N = input.readWord();
   
   return [N];
 };
@@ -10,23 +10,55 @@ var parse = function(input) {
 // Solution Implementation
 var solve = function(N) {
 
-  if(N == 0)
-    return "INSOMNIA";
+  var len = N.length;
+  var steps = 0;
 
-  for(var i = 1, digits = {}; i < 100; i++) {    
+  while(true) {
 
-    var sNumber = (N*i).toString();
-    for (var d = 0, len = sNumber.length; d < len; d += 1) {
-        digits[+sNumber.charAt(d)] = +sNumber.charAt(d);
+    var done = getDone(N);
+    if(done == len)
+      return steps;
+
+    var pluses = 0;
+    while(pluses < len && N.charAt(pluses) == "+")
+      pluses++;
+
+    if(pluses) {
+      N = flip(N, pluses);
+      steps++;
     }
 
-    if(Object.keys(digits).length == 10) {
-      return i*N;
-    }
+    N = flip(N, len - done);
+    steps++;
   }
 
-  return "INSOMNIA";
+  return steps;
 };
+
+var flip = function(s, n) {
+  var res = "";
+  for(var i = 0, len = s.length; i<len; i++) {
+    if(i < n)  { 
+      var c = s.charAt(n - i - 1);
+      res += c == "-" ? "+" : "-";
+    }
+    else 
+      res += s.charAt(i);
+  }
+  return res;
+};
+
+var getDone = function(s) {
+  var n = 0;
+  for(var i = s.length - 1; i>=0; i--) {
+    if(s.charAt(i) == "-")
+      return n;
+    n++;
+  }
+  return n;
+}
+
+
 
 
 // Boilerplate
