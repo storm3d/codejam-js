@@ -2,67 +2,87 @@
 
 // Use this to parse arguments for solve
 var parse = function(input) {
-  var N = input.readWord();
+  var N = input.readInt();
+  var J = input.readInt();
   
-  return [N];
+  return [N, J];
 };
 
 // Solution Implementation
-var solve = function(N) {
+var solve = function(N, J) {
+  var out = "";
+  var minj = "", maxj = "";
+  for(var i = 0; i < N; i++) {
+    if(i == 0 || i == N - 1) {
+      minj+="1";
+      maxj+="1";
+    }
+    else {
+      minj+="0";
+      maxj+="1";
+    }
+  }
 
-  var len = N.length;
-  var steps = 0;
+  minj = bigInt(minj, 2);
+  maxj = bigInt(maxj, 2);
 
-  while(true) {
 
-    var done = getDone(N);
-    if(done == len)
-      return steps;
+/*
+  var mins = {},
+    maxs = {};
 
-    var pluses = 0;
-    while(pluses < len && N.charAt(pluses) == "+")
-      pluses++;
+  for(var i = 2; i <= 10; i++) {
+    mins[i] = bigInt(minj.toString(2), i);
+    maxs[i] = bigInt(maxj.toString(2), i);
+  }
+*/
+//  console.log(mins);
+  //console.log(maxs);
 
-    if(pluses) {
-      N = flip(N, pluses);
-      steps++;
+  for(var cur = minj, j = 0; cur.leq(maxj) && j < J; cur = cur.add(2)) {
+    
+
+    var isPrime = false;
+    var divisors = [];
+
+    for(var i = 2; i <= 10; i++) {
+        var curn = bigInt(cur.toString(2), i);
+        //console.log(curn.toString(10));
+        
+        
+        if(curn.isProbablePrime()) {
+          isPrime = true;
+          break;
+        }
+        
+
+        for(var d = bigInt(2); d.leq(1000); d = d.add(1)) {
+          if(curn.isDivisibleBy(d)) {
+            divisors.push(d);
+            break;
+          }
+          //console.log(d);
+        }
     }
 
-    N = flip(N, len - done);
-    steps++;
+
+    if(!isPrime && Object.keys(divisors).length == 9) {
+      out += cur.toString(2) + " ";
+      out += divisors.join(" ") + "\n";
+      j++;
+     }
   }
 
-  return steps;
+
+
+  return out;
 };
-
-var flip = function(s, n) {
-  var res = "";
-  for(var i = 0, len = s.length; i<len; i++) {
-    if(i < n)  { 
-      var c = s.charAt(n - i - 1);
-      res += c == "-" ? "+" : "-";
-    }
-    else 
-      res += s.charAt(i);
-  }
-  return res;
-};
-
-var getDone = function(s) {
-  var n = 0;
-  for(var i = s.length - 1; i>=0; i--) {
-    if(s.charAt(i) == "-")
-      return n;
-    n++;
-  }
-  return n;
-}
-
 
 
 
 // Boilerplate
 var fs = require('fs');
+var bigInt = require("big-integer");
 var inputFile = "data.in";
 
 function Input(input) {
@@ -78,7 +98,7 @@ var run = function(input) {
 
 
   for (var t = 1; t <= T; t++) {
-    output += 'Case #' + t + ': ' + solve.apply(null, parse(input)) + '\n';
+    output += 'Case #' + t + ':\n' + solve.apply(null, parse(input)) + '\n';
   }
 
   console.log(output);
