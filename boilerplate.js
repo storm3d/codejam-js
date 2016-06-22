@@ -1,88 +1,36 @@
 'use strict';
 
-var digits = ["ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"];
-
 // Use this to parse arguments for solve
 var parse = function(input) {
-  var S = input.readWord();
-  return [S];
+  var tri = [];
+  var line;
+  while(line = input.readLine()) {    
+    tri.push(line.split(' ').map(Number));
+  }
+  return [tri];
 };
 
 // Solution Implementation
 var solve = function(S) {
 
-  var forbidden = new Array();
   
-  var out = "";
-  
+  console.log(S);
 
-  while(1) {
+  for(var j = S.length - 2; j >= 0; j--) {
 
-    var s = S.split('');
-
-    for(var i = 0; i < digits.length; i++) {
-  //    console.log(digits[i]);
-
-      while(1) {
-        var digit = digits[i].split('');
-
-        var sBackup = s.slice();
-        for(var j = 0; j < s.length; j++) {
-
-          for(var k = 0; k < digit.length; k++) {
-
-            if(s[j] == digit[k]) {
-  //            console.log(s+ " = " + digit + " = " + s[j]);
-              s.splice(j, 1);
-              digit.splice(k, 1);
-
-              if(digit.length == 0) {
-
-                var isForbidden = false;
-                for(var o = 0; o < forbidden.length; o++) {
-
-                  if(i == forbidden[o][forbidden[o].length - 1]) {
-                    isForbidden = true;
-                    console.log("forb");
-                    break;
-                  }
-                }
-
-                if(!isForbidden)
-                  out+=i;
-                break;
-              }
-
-              k--;
-              j--;
-            }
-          }
-        }
-        if(digit.length) {
-          s = sBackup;
-          break;
-        }
-      }
+    for(var i = 0; i < S[j].length; i++) {
+      S[j][i] += Math.max(S[j + 1][i], S[j + 1][i + 1]);
     }
-
-    if(!s.length)
-        break;
-
-    forbidden.push(out);
-    console.log(forbidden);
   }
-  
-  
 
-  return out;
+  return S[0][0];
 };
-
 
 
 // Boilerplate
 var fs = require('fs');
 var bigInt = require("big-integer");
-var inputFile = "A-small-attempt0.in";
+var inputFile = "data.in";
 
 function Input(input) {
   this.input = input;
