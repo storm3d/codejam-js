@@ -1,79 +1,78 @@
 'use strict';
 
+var digits = ["ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"];
+
 // Use this to parse arguments for solve
 var parse = function(input) {
-  var N = input.readInt();
-  var J = input.readInt();
-  
-  return [N, J];
+  var S = input.readWord();
+  return [S];
 };
 
 // Solution Implementation
-var solve = function(N, J) {
+var solve = function(S) {
+
+  var forbidden = new Array();
+  
   var out = "";
-  var minj = "", maxj = "";
-  for(var i = 0; i < N; i++) {
-    if(i == 0 || i == N - 1) {
-      minj+="1";
-      maxj+="1";
-    }
-    else {
-      minj+="0";
-      maxj+="1";
-    }
-  }
+  
 
-  minj = bigInt(minj, 2);
-  maxj = bigInt(maxj, 2);
+  while(1) {
 
+    var s = S.split('');
 
-/*
-  var mins = {},
-    maxs = {};
+    for(var i = 0; i < digits.length; i++) {
+  //    console.log(digits[i]);
 
-  for(var i = 2; i <= 10; i++) {
-    mins[i] = bigInt(minj.toString(2), i);
-    maxs[i] = bigInt(maxj.toString(2), i);
-  }
-*/
-//  console.log(mins);
-  //console.log(maxs);
+      while(1) {
+        var digit = digits[i].split('');
 
-  for(var cur = minj, j = 0; cur.leq(maxj) && j < J; cur = cur.add(2)) {
-    
+        var sBackup = s.slice();
+        for(var j = 0; j < s.length; j++) {
 
-    var isPrime = false;
-    var divisors = [];
+          for(var k = 0; k < digit.length; k++) {
 
-    for(var i = 2; i <= 10; i++) {
-        var curn = bigInt(cur.toString(2), i);
-        //console.log(curn.toString(10));
-        
-        
-        if(curn.isProbablePrime()) {
-          isPrime = true;
+            if(s[j] == digit[k]) {
+  //            console.log(s+ " = " + digit + " = " + s[j]);
+              s.splice(j, 1);
+              digit.splice(k, 1);
+
+              if(digit.length == 0) {
+
+                var isForbidden = false;
+                for(var o = 0; o < forbidden.length; o++) {
+
+                  if(i == forbidden[o][forbidden[o].length - 1]) {
+                    isForbidden = true;
+                    console.log("forb");
+                    break;
+                  }
+                }
+
+                if(!isForbidden)
+                  out+=i;
+                break;
+              }
+
+              k--;
+              j--;
+            }
+          }
+        }
+        if(digit.length) {
+          s = sBackup;
           break;
         }
-        
-
-        for(var d = bigInt(2); d.leq(1000); d = d.add(1)) {
-          if(curn.isDivisibleBy(d)) {
-            divisors.push(d);
-            break;
-          }
-          //console.log(d);
-        }
+      }
     }
 
+    if(!s.length)
+        break;
 
-    if(!isPrime && Object.keys(divisors).length == 9) {
-      out += cur.toString(2) + " ";
-      out += divisors.join(" ") + "\n";
-      j++;
-     }
+    forbidden.push(out);
+    console.log(forbidden);
   }
-
-
+  
+  
 
   return out;
 };
@@ -83,7 +82,7 @@ var solve = function(N, J) {
 // Boilerplate
 var fs = require('fs');
 var bigInt = require("big-integer");
-var inputFile = "data.in";
+var inputFile = "A-small-attempt0.in";
 
 function Input(input) {
   this.input = input;
@@ -98,7 +97,7 @@ var run = function(input) {
 
 
   for (var t = 1; t <= T; t++) {
-    output += 'Case #' + t + ':\n' + solve.apply(null, parse(input)) + '\n';
+    output += 'Case #' + t + ': ' + solve.apply(null, parse(input)) + '\n';
   }
 
   console.log(output);
